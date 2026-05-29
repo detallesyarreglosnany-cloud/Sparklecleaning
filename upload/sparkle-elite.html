@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sparkle Elite Cleaning — Limpieza Premium en DC, VA & MD ✨</title>
+<meta name="description" content="Limpieza premium profesional en Washington DC, Virginia y Maryland. Hogares, empresas, Airbnb. Cotiza gratis en 3 minutos." />
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root{
+    --gold:#FFD700;
+    --primary:#1A3BCC;
+    --primary-deep:#0D1B4B;
+    --bg-1:#0A0F2E;
+    --bg-2:#0D1B4B;
+    --gradient-primary: linear-gradient(135deg,#1A3BCC,#2C4FE0);
+    --gradient-gold: linear-gradient(135deg,#FFE680,#FFB300);
+    --gradient-hero: radial-gradient(ellipse at top, #0E5566 0%, #093645 60%);
+    --gradient-shimmer: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.45) 50%, transparent 65%);
+    --shadow-premium: 0 20px 60px -20px rgba(26,59,204,.45);
+    --shadow-soft: 0 8px 30px -10px rgba(10,15,46,.45);
+  }
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    color:#E8F0FF;
+    background:
+      radial-gradient(ellipse at top, rgba(40,60,180,.4), transparent 60%),
+      linear-gradient(180deg,#0A0F2E 0%,#0D1B4B 100%);
+    background-attachment:fixed;
+    min-height:100vh;
+  }
+  .font-display{font-family:'Playfair Display',serif;letter-spacing:-.01em}
+  .font-accent{font-family:'Montserrat',sans-serif}
+  .text-gold{color:var(--gold)}
+  .bg-gold{background:var(--gold)}
+  .border-gold{border-color:var(--gold)}
+  .gradient-text-royal{background:linear-gradient(135deg,#FFD700,#FFE680);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .gradient-text-gold{background:var(--gradient-gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .glass-card{background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);box-shadow:var(--shadow-soft)}
+  .section-alt{background:linear-gradient(180deg,#0F1635 0%,#0C1330 100%)}
+  .hover-lift{transition:transform .35s cubic-bezier(.2,.9,.3,1.2),box-shadow .35s ease}
+  .hover-lift:hover{transform:translateY(-6px);box-shadow:var(--shadow-premium)}
+  .gold-underline{position:relative;display:inline-block}
+  .gold-underline::after{content:"";position:absolute;left:10%;right:10%;bottom:-10px;height:3px;background:var(--gradient-gold);border-radius:2px}
+  /* Animations */
+  @keyframes twinkle{0%,100%{opacity:0;transform:scale(.4) rotate(0)}50%{opacity:1;transform:scale(1) rotate(180deg)}}
+  @keyframes float-up{0%{transform:translateY(110vh) scale(.6);opacity:0}10%{opacity:.7}90%{opacity:.7}100%{transform:translateY(-10vh) scale(1.1);opacity:0}}
+  @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+  @keyframes gold-glow{0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,.5)}50%{box-shadow:0 0 30px 8px rgba(255,215,0,.35)}}
+  @keyframes fade-in-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .animate-fade-in-up{animation:fade-in-up .8s ease-out both}
+  .animate-twinkle{animation:twinkle 2.4s ease-in-out infinite;display:inline-block}
+  .animate-float-up{animation:float-up linear infinite}
+  .animate-gold-glow{animation:gold-glow 2.8s ease-in-out infinite}
+  .btn-shimmer{position:relative;overflow:hidden;isolation:isolate}
+  .btn-shimmer::before{content:"";position:absolute;inset:0;background:var(--gradient-shimmer);background-size:200% 100%;animation:shimmer 2.8s linear infinite;pointer-events:none;z-index:1}
+  .btn-shimmer>*{position:relative;z-index:2}
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s ease}
+  .reveal.in{opacity:1;transform:translateY(0)}
+  .text-muted{color:rgba(232,240,255,.7)}
+  .bg-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+  /* Leaflet popup overrides */
+  .leaflet-popup-content-wrapper{border-radius:14px}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="w-full bg-[#1A3BCC] text-white text-xs md:text-sm">
+  <div class="mx-auto max-w-7xl px-4 py-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-1">
+    <a href="tel:+12025550199" class="flex items-center gap-1.5 hover:text-yellow-300 transition">📞 (202) 555-0199</a>
+    <a href="https://wa.me/12025550199" class="flex items-center gap-1.5 hover:text-yellow-300 transition">💬 WhatsApp</a>
+    <a href="mailto:hello@sparkleelite.com" class="hidden sm:flex items-center gap-1.5 hover:text-yellow-300 transition">✉️ hello@sparkleelite.com</a>
+    <span class="hidden md:flex items-center gap-1.5 opacity-80">🕒 Lun–Dom 7AM–8PM</span>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<header class="sticky top-0 z-30 backdrop-blur bg-[#0A0F2E]/80 border-b border-white/10">
+  <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <defs>
+          <linearGradient id="brush" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#2C4FE0"/><stop offset="100%" stop-color="#0D1B4B"/>
+          </linearGradient>
+          <linearGradient id="goldL" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#FFE680"/><stop offset="100%" stop-color="#FFB300"/>
+          </linearGradient>
+        </defs>
+        <path d="M10 26 L20 10 L30 26 L26 30 L14 30 Z" fill="url(#brush)"/>
+        <path d="M14 30 L26 30 L24 36 L16 36 Z" fill="#0D1B4B"/>
+        <path d="M30 6 L31.2 9 L34 10 L31.2 11 L30 14 L28.8 11 L26 10 L28.8 9 Z" fill="url(#goldL)"/>
+        <path d="M8 14 L8.8 16 L11 17 L8.8 18 L8 20 L7.2 18 L5 17 L7.2 16 Z" fill="url(#goldL)"/>
+      </svg>
+      <div class="leading-none">
+        <div class="font-display text-lg font-bold gradient-text-royal">Sparkle Elite</div>
+        <div class="text-[10px] uppercase tracking-[0.2em] text-muted">Premium Cleaning</div>
+      </div>
+    </div>
+    <nav class="hidden md:flex items-center gap-7 text-sm font-medium">
+      <a href="#servicios" class="hover:text-yellow-300 transition">Servicios</a>
+      <a href="#precios" class="hover:text-yellow-300 transition">Precios</a>
+      <a href="#calculadora" class="hover:text-yellow-300 transition">Cotizar</a>
+      <a href="#agenda" class="hover:text-yellow-300 transition">Agendar</a>
+    </nav>
+    <a href="#calculadora" class="btn-shimmer rounded-full px-5 py-2 font-accent font-semibold text-white text-sm" style="background:var(--gradient-primary)">✨ Cotizar gratis</a>
+  </div>
+</header>
+
+<main>
+
+<!-- HERO -->
+<section class="relative isolate overflow-hidden pt-10 pb-24 md:pt-16 md:pb-32" style="background:var(--gradient-hero)">
+  <div id="sparkles" class="pointer-events-none absolute inset-0 overflow-hidden"></div>
+  <div class="relative mx-auto max-w-6xl px-4 text-center">
+    <span class="inline-flex items-center gap-2 rounded-full border border-yellow-300/40 bg-yellow-100/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-yellow-200 animate-fade-in-up">
+      ✨ DC · Virginia · Maryland
+    </span>
+    <h1 class="mt-6 font-display text-4xl md:text-6xl lg:text-7xl font-bold leading-tight animate-fade-in-up" style="animation-delay:.1s">
+      <span class="gradient-text-royal">Date un respiro</span><br>
+      <span class="text-amber-300">Nosotros lo hacemos</span>
+      <span class="gradient-text-gold">brillar</span>
+      <span class="animate-twinkle ml-2">✨</span>
+    </h1>
+    <p class="mt-6 mx-auto max-w-2xl text-lg md:text-xl text-muted animate-fade-in-up" style="animation-delay:.2s">
+      Limpieza premium profesional en DC, Virginia & Maryland.<br class="hidden md:block">
+      Hogares, empresas, Airbnb y más — resultados que se ven y se sienten.
+    </p>
+    <p class="mt-5 mx-auto max-w-xl text-base italic text-white/80 animate-fade-in-up" style="animation-delay:.3s">
+      "Imagina llegar a casa y encontrar cada rincón impecable, cada superficie brillando, ese aroma fresco que solo los profesionales podemos lograr. Eso es Sparkle Elite."
+    </p>
+    <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style="animation-delay:.4s">
+      <a href="#calculadora" class="btn-shimmer animate-gold-glow inline-flex items-center gap-2 rounded-full px-8 py-4 font-accent font-bold text-white" style="background:var(--gradient-primary);box-shadow:var(--shadow-premium)">
+        ✨ Cotiza tu limpieza GRATIS ahora
+      </a>
+      <a href="tel:+12025550199" class="inline-flex items-center gap-2 rounded-full border-2 border-white/20 bg-white/5 px-8 py-4 font-accent font-semibold text-white hover:border-white/50 transition">
+        📞 Habla con nosotros
+      </a>
+    </div>
+    <div class="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-muted animate-fade-in-up" style="animation-delay:.5s">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1.5 border border-white/10">🛡️ <span class="font-medium text-white">100% Garantizado</span></span>
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1.5 border border-white/10">⭐ <span class="font-medium text-white">5 Estrellas</span></span>
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1.5 border border-white/10">🔒 <span class="font-medium text-white">Personal verificado</span></span>
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1.5 border border-white/10">🌿 <span class="font-medium text-white">Productos seguros</span></span>
+    </div>
+    <div class="mt-12 inline-flex flex-col items-center rounded-2xl glass-card px-8 py-5 animate-fade-in-up" style="animation-delay:.6s">
+      <div class="font-display text-4xl md:text-5xl font-bold gradient-text-royal">+<span id="counter">0</span></div>
+      <div class="text-sm text-muted mt-1">hogares transformados en DC, VA & MD</div>
+    </div>
+  </div>
+</section>
+
+<!-- PREMIUM INCLUDES -->
+<section class="py-20">
+  <div class="mx-auto max-w-5xl px-4">
+    <div class="text-center mb-10 reveal">
+      <p class="text-sm font-accent font-bold uppercase tracking-[.25em] text-yellow-300">Nuestro servicio premium incluye</p>
+      <h2 class="mt-3 font-display text-3xl md:text-5xl font-bold">En cada limpieza de cualquier espacio <span class="animate-twinkle ml-2">✨</span></h2>
+      <p class="mt-3 text-muted italic">sin atajos, sin excusas</p>
+    </div>
+    <ul id="includes" class="grid gap-x-10 md:grid-cols-2"></ul>
+    <div class="mt-10 pt-6 border-t border-white/10 text-center mx-auto max-w-2xl flex items-start justify-center gap-3 text-sm text-white/70">
+      <span class="text-yellow-300 text-lg">📦</span>
+      <p>Los productos de limpieza los aporta el cliente. ¿No tienes? Sin problema — los llevamos nosotros por un pequeño costo adicional según el tamaño de tu espacio.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="servicios" class="py-24 section-alt">
+  <div class="mx-auto max-w-6xl px-4">
+    <div class="text-center mb-14 reveal">
+      <p class="text-sm font-accent font-bold uppercase tracking-[.25em] text-yellow-300">Catálogo</p>
+      <h2 class="mt-3 font-display text-4xl md:text-5xl font-bold">Servicios para <span class="gold-underline gradient-text-royal">cada espacio</span></h2>
+      <p class="mt-4 text-muted max-w-2xl mx-auto">Sin importar el tamaño o el reto, tenemos un servicio diseñado para ti.</p>
+    </div>
+    <div id="services-grid" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"></div>
+  </div>
+</section>
+
+<!-- CALCULATOR (simplificada) -->
+<section id="calculadora" class="py-24">
+  <div class="mx-auto max-w-3xl px-4">
+    <div class="text-center mb-10 reveal">
+      <p class="text-sm font-accent font-bold uppercase tracking-[.25em] text-yellow-300">Cotizador inteligente</p>
+      <h2 class="mt-3 font-display text-4xl md:text-5xl font-bold">Tu cotización en <span class="gradient-text-gold">3 minutos</span></h2>
+      <p class="mt-3 text-muted">Selecciona tu tipo de espacio y obtén un estimado al instante.</p>
+    </div>
+    <div class="glass-card rounded-3xl p-6 md:p-10">
+      <label class="block text-sm font-semibold mb-2">Tipo de espacio</label>
+      <select id="calc-type" class="w-full rounded-xl bg-white/10 border border-white/20 px-4 py-3 text-white">
+        <option value="75">Room / Habitación — $75</option>
+        <option value="95">Studio — $95</option>
+        <option value="130" selected>Apartment / Departamento — $130</option>
+        <option value="180">House / Casa — $180</option>
+        <option value="95">Airbnb / Vacation Rental — $95</option>
+        <option value="250">Events / Eventos — $250</option>
+        <option value="80">Offices / Oficinas — $80</option>
+        <option value="390">Large Home — $390</option>
+      </select>
+
+      <label class="block text-sm font-semibold mb-2 mt-5">Frecuencia</label>
+      <div class="grid grid-cols-3 gap-2">
+        <button data-freq="1" class="freq-btn rounded-xl border border-white/20 py-3 text-sm hover:bg-white/10">Una vez</button>
+        <button data-freq=".9" class="freq-btn rounded-xl border border-white/20 py-3 text-sm hover:bg-white/10">Mensual (-10%)</button>
+        <button data-freq=".8" class="freq-btn rounded-xl border border-white/20 py-3 text-sm hover:bg-white/10">Semanal (-20%)</button>
+      </div>
+
+      <div class="mt-8 rounded-2xl border border-yellow-300/40 bg-yellow-300/5 p-6 text-center">
+        <div class="text-xs uppercase tracking-widest text-yellow-300">Tu estimado</div>
+        <div class="mt-2 font-display text-5xl font-bold gradient-text-royal">$<span id="calc-total">130</span></div>
+        <p class="mt-2 text-sm text-muted">Cotización aproximada. Confirmamos el total final por WhatsApp.</p>
+        <a href="#agenda" class="btn-shimmer mt-5 inline-block rounded-full px-6 py-3 font-accent font-bold text-white" style="background:var(--gradient-primary)">Agendar con $15 →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="precios" class="py-24 section-alt">
+  <div class="mx-auto max-w-6xl px-4">
+    <div class="text-center mb-14 reveal">
+      <p class="text-sm font-accent font-bold uppercase tracking-[.25em] text-yellow-300">Precios</p>
+      <h2 class="mt-3 font-display text-4xl md:text-5xl font-bold">Transparentes, <span class="gradient-text-gold">sin sorpresas</span></h2>
+      <p class="mt-4 text-muted">Porque mereces saber exactamente qué estás obteniendo.</p>
+    </div>
+    <div id="pricing-grid" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"></div>
+    <div class="mt-10 rounded-2xl bg-white/5 p-6 text-sm text-white/80 border border-yellow-300/20">
+      <p class="font-semibold text-yellow-300 mb-2">💡 Supplies not included</p>
+      <p>Client provides cleaning products. Need us to bring them? Small additional fee applies — ask us for details.</p>
+    </div>
+    <p class="mt-6 text-center text-sm text-muted italic max-w-2xl mx-auto">All prices are base estimates. Your exact quote is calculated with our smart estimator above. No surprises — ever. 💙</p>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="py-24">
+  <div class="mx-auto max-w-5xl px-4">
+    <div class="text-center mb-12 reveal">
+      <p class="text-sm font-accent font-bold uppercase tracking-[.25em] text-yellow-300">Testimoniales</p>
+      <h2 class="mt-3 font-display text-4xl md:text-5xl font-bold">Lo que dicen <span class="gradient-text-royal">nuestras familias</span></h2>
+      <p class="mt-3 text-muted">Más de 2,800 hogares transformados — esto es lo que nos dicen 💙</p>
+    </div>
+    <div class="relative rounded-3xl bg-white/5 border border-white/10 p-8 md:p-12">
+      <div class="text-yellow-300 mb-4">⭐⭐⭐⭐⭐</div>
+      <p id="t-text" class="font-display text-xl md:text-2xl leading-relaxed italic">"…"</p>
+      <div class="mt-6 flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <div id="t-name" class="font-semibold"></div>
+          <div id="t-city" class="text-sm text-muted"></div>
+        </div>
+        <span class="inline-flex items-center gap-1.5 text-xs font-medium text-green-400">🛡️ <span id="t-tag"></span></span>
+      </div>
+      <button id="t-prev" class="absolute -left-4 top-1/2 -translate-y-1/2 hidden md:flex h-10 w-10 rounded-full bg-white/10 border border-white/20 items-center justify-center hover:bg-[#1A3BCC] transition">‹</button>
+      <button id="t-next" class="absolute -right-4 top-1/2 -translate-y-1/2 hidden md:flex h-10 w-10 rounded-full bg-white/10 border border-white/20 items-center justify-center hover:bg-[#1A3BCC] transition">›</button>
+    </div>
+    <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+      <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="font-display text-xl font-bold gradient-text-royal">4.9 / 5</div><div class="text-xs text-muted mt-1">Google · 847 reviews</div></div>
+      <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="font-display text-xl font-bold gradient-text-royal">4.8 / 5</div><div class="text-xs text-muted mt-1">Yelp</div></div>
+      <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="font-display text-xl font-bold gradient-text-royal">BBB</div><div class="text-xs text-muted mt-1">Accredited Business</div></div>
+      <div class="rounded-xl bg-white/5 border border-white/10 p-4"><div class="font-display text-xl font-bold gradient-text-royal">Best DC</div><div class="text-xs text-muted mt-1">Cleaning 2023–2024</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<section class="py-24 section-alt">
+  <div class="mx-auto max-w-6xl px-4">
+    <div class="text-center mb-10 reveal">
+      <p class="text-sm font-accent font-bold uppercase tracking-[.25em] text-yellow-300">Cobertura</p>
+      <h2 class="mt-3 font-display text-4xl md:text-5xl font-bold">Donde trabajamos <span class="gradient-text-gold">✨</span></h2>
+      <p class="mt-3 text-muted max-w-2xl mx-auto">Todo el área del Metro DC — tu hogar está en nuestra zona.</p>
+    </div>
+    <div class="relative rounded-3xl overflow-hidden border border-yellow-300/30" style="box-shadow:var(--shadow-premium)">
+      <div id="map" style="height:500px;width:100%;background:#0b1020"></div>
+    </div>
+    <p class="mt-6 text-center text-muted">¿No ves tu área? Escríbenos — probablemente llegamos 🙂</p>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section id="agenda" class="py-24">
+  <div class="mx-auto max-w-3xl px-4 text-center">
+    <p class="text-sm font-accent font-bold uppercase tracking-[.25em] text-yellow-300">Agenda</p>
+    <h2 class="mt-3 font-display text-4xl md:text-5xl font-bold">Reserva tu fecha <span class="gradient-text-gold">en minutos</span></h2>
+    <p class="mt-3 text-muted">Solo $15 para apartar tu día. El resto al finalizar el servicio.</p>
+    <form id="booking" class="glass-card mt-8 rounded-3xl p-6 md:p-10 text-left grid gap-4">
+      <input class="rounded-xl bg-white/10 border border-white/20 px-4 py-3" placeholder="Tu nombre" required>
+      <input type="tel" class="rounded-xl bg-white/10 border border-white/20 px-4 py-3" placeholder="Teléfono / WhatsApp" required>
+      <input type="email" class="rounded-xl bg-white/10 border border-white/20 px-4 py-3" placeholder="Email" required>
+      <input type="date" class="rounded-xl bg-white/10 border border-white/20 px-4 py-3" required>
+      <textarea class="rounded-xl bg-white/10 border border-white/20 px-4 py-3" rows="3" placeholder="Cuéntanos sobre tu espacio…"></textarea>
+      <button type="submit" class="btn-shimmer rounded-full px-6 py-3 font-accent font-bold text-white" style="background:var(--gradient-primary)">Confirmar reserva ($15)</button>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="text-white pt-16 pb-8" style="background:linear-gradient(180deg,#1A2C8C,#0D1B4B)">
+  <div class="mx-auto max-w-6xl px-4">
+    <div class="grid gap-10 md:grid-cols-4">
+      <div>
+        <div class="rounded-xl bg-white/95 px-3 py-2 inline-block">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">✨</span>
+            <div class="leading-none">
+              <div class="font-display text-lg font-bold" style="color:#1A3BCC">Sparkle Elite</div>
+              <div class="text-[10px] uppercase tracking-[.2em] text-gray-600">Premium Cleaning</div>
+            </div>
+          </div>
+        </div>
+        <p class="mt-4 text-sm text-white/80 italic">Tu hogar, nuestro orgullo ✨</p>
+      </div>
+      <div>
+        <h4 class="font-accent font-bold uppercase text-xs tracking-widest text-yellow-300 mb-4">Servicios</h4>
+        <ul class="space-y-2 text-sm text-white/85">
+          <li>Limpieza residencial</li><li>Limpieza profunda</li><li>Airbnb / Turnover</li><li>Oficinas y eventos</li><li>Post-mudanza</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-accent font-bold uppercase text-xs tracking-widest text-yellow-300 mb-4">Áreas</h4>
+        <ul class="space-y-2 text-sm text-white/85">
+          <li>Washington DC</li><li>Arlington · Alexandria · Fairfax</li><li>McLean · Vienna · Reston</li><li>Bethesda · Silver Spring</li><li>Rockville · Gaithersburg</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-accent font-bold uppercase text-xs tracking-widest text-yellow-300 mb-4">Certificaciones</h4>
+        <ul class="space-y-2 text-sm text-white/85">
+          <li>🛡️ Licensed, Bonded & Insured</li>
+          <li>🌿 EPA-Certified Green</li>
+          <li>👤 Background-checked</li>
+          <li>🏆 BBB Accredited</li>
+        </ul>
+      </div>
+    </div>
+    <div class="mt-12 pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-white/70">
+      <p>© 2024 Sparkle Elite Cleaning. All rights reserved.</p>
+      <p>Serving DC, Virginia & Maryland with pride 💙</p>
+    </div>
+  </div>
+</footer>
+
+<!-- WHATSAPP FAB -->
+<a href="https://wa.me/12025550199" target="_blank" class="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center shadow-2xl text-2xl" title="WhatsApp">💬</a>
+
+<!-- CHATBOT -->
+<div class="fixed bottom-6 left-6 z-40">
+  <button id="chat-toggle" class="h-14 w-14 rounded-full text-white flex items-center justify-center shadow-2xl text-2xl" style="background:var(--gradient-primary)">✨</button>
+  <div id="chat-panel" class="hidden mt-3 w-80 rounded-2xl glass-card p-4">
+    <div class="font-display text-lg gradient-text-royal mb-2">Sparkle Assistant</div>
+    <div class="text-sm text-muted mb-3">¡Hola! ¿En qué puedo ayudarte hoy?</div>
+    <div class="flex flex-col gap-2">
+      <a href="#calculadora" class="rounded-lg bg-white/10 hover:bg-white/15 px-3 py-2 text-sm">💰 Quiero una cotización</a>
+      <a href="#agenda" class="rounded-lg bg-white/10 hover:bg-white/15 px-3 py-2 text-sm">📅 Agendar limpieza</a>
+      <a href="https://wa.me/12025550199" class="rounded-lg bg-white/10 hover:bg-white/15 px-3 py-2 text-sm">💬 Hablar con humano</a>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* === Sparkles & bubbles === */
+(function(){
+  const root=document.getElementById('sparkles');
+  for(let i=0;i<28;i++){
+    const s=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    s.setAttribute('viewBox','0 0 24 24');
+    const size=6+Math.random()*14;
+    s.style.cssText=`position:absolute;top:${Math.random()*100}%;left:${Math.random()*100}%;width:${size}px;height:${size}px;animation:twinkle ${1.8+Math.random()*2.5}s ease-in-out ${Math.random()*3}s infinite`;
+    s.innerHTML='<path d="M12 2 L13.6 9.4 L21 11 L13.6 12.6 L12 20 L10.4 12.6 L3 11 L10.4 9.4 Z" fill="#FFE680"/>';
+    root.appendChild(s);
+  }
+  for(let i=0;i<10;i++){
+    const b=document.createElement('span');
+    const size=18+Math.random()*38;
+    b.style.cssText=`position:absolute;left:${Math.random()*100}%;width:${size}px;height:${size}px;border-radius:50%;background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(180,200,255,.4) 60%, transparent 70%);border:1px solid rgba(255,255,255,.55);animation:float-up ${14+Math.random()*10}s linear ${Math.random()*12}s infinite`;
+    root.appendChild(b);
+  }
+})();
+
+/* === Counter === */
+(function(){
+  const el=document.getElementById('counter');
+  const target=2847;const start=performance.now();
+  function tick(t){const p=Math.min(1,(t-start)/1800);el.textContent=Math.floor(p*target).toLocaleString();if(p<1)requestAnimationFrame(tick)}
+  requestAnimationFrame(tick);
+})();
+
+/* === Includes list === */
+const includes=[
+  {t:"Aspirado de todas las áreas"},{t:"Lavado profundo de baños completos"},
+  {t:"Mopeo y sanitización de pisos"},{t:"Retiro de polvo y residuos"},
+  {t:"Limpieza de estufa y hornos"},{t:"Limpieza interior del refrigerador"},
+  {t:"Lavado y sanitización de papeleras"},{t:"Limpieza de campana extractora"},
+  {t:"Cambio de sábanas y edredones",b:"Airbnb ✨"},
+  {t:"Aplicación de desinfectante (fragancia a tu elección)"},
+  {t:"Recolección y retiro de basura"},{t:"Organización de espacios"},
+  {t:"Limpieza básica de ventanas internas"}
+];
+const ul=document.getElementById('includes');
+includes.forEach(it=>{
+  const li=document.createElement('li');
+  li.className='flex items-center gap-3 border-b border-white/10 px-1 reveal';
+  li.style.minHeight='48px';
+  li.innerHTML=`<span style="color:#FFD700" class="text-lg font-bold">✓</span><span class="text-white text-base">${it.t}</span>${it.b?`<span class="ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold" style="background:rgba(255,215,0,.15);border:1px solid #FFD700;color:#FFD700">${it.b}</span>`:''}`;
+  ul.appendChild(li);
+});
+
+/* === Services === */
+const services=[
+  {i:"🛏️",t:"Habitación / Room",d:"1 space + bathroom"},
+  {i:"🏠",t:"Studio",d:"3 spaces + bathroom"},
+  {i:"🏢",t:"Departamento / Apartment",d:"Up to 5 spaces + 2 bathrooms"},
+  {i:"🏡",t:"Casas / Quintas / Houses",d:"5+ spaces + bathrooms + external areas"},
+  {i:"🏨",t:"Airbnb / Vacation Rental",d:"From 1 space + bathroom"},
+  {i:"🎉",t:"Eventos / Events",d:"Pre & post-event, halls & venues"}
+];
+const sg=document.getElementById('services-grid');
+services.forEach(s=>{
+  const c=document.createElement('div');
+  c.className='reveal rounded-2xl p-4 flex flex-col items-center text-center transition';
+  c.style.cssText='background:rgba(255,255,255,.04);border:1px solid rgba(255,215,0,.2);box-shadow:0 4px 6px rgba(0,0,0,.3),0 10px 20px rgba(0,0,0,.2)';
+  c.onmouseenter=()=>{c.style.transform='translateY(-6px)';c.style.borderColor='rgba(255,215,0,.6)'};
+  c.onmouseleave=()=>{c.style.transform='translateY(0)';c.style.borderColor='rgba(255,215,0,.2)'};
+  c.innerHTML=`<div class="inline-flex h-12 w-12 items-center justify-center rounded-xl text-2xl" style="background:var(--gradient-primary)">${s.i}</div><h3 class="mt-2 font-display text-lg font-semibold">${s.t}</h3><p class="mt-1 text-sm text-muted">${s.d}</p>`;
+  sg.appendChild(c);
+});
+
+/* === Pricing === */
+const tiers=[
+  {n:"Room / Habitación",p:75,d:"1 space + bathroom",time:"3–5 hrs · 1 cleaner"},
+  {n:"Studio",p:95,from:"desde",d:"3 spaces + bathroom",time:"4–5 hrs · 1 cleaner"},
+  {n:"Apartment / Departamento",p:130,from:"desde",d:"Up to 5 spaces + 2 bathrooms",time:"4–5 hrs · 1–2 cleaners",popular:true},
+  {n:"House / Casa o Quinta",p:180,from:"desde",d:"5+ spaces + bathrooms + external areas",time:"5–7 hrs · 2 cleaners"},
+  {n:"Airbnb / Vacation Rental",p:95,from:"desde",d:"From 1 space + bathroom",time:"3.5 hrs · 1 cleaner"},
+  {n:"Events / Eventos",p:250,from:"desde",d:"Pre & post-event, halls & venues",time:"5–6 hrs · 2–3 cleaners"},
+  {n:"Offices / Oficinas",p:80,from:"desde",d:"Commercial spaces & offices",time:"3–8 hrs · 1 cleaner"},
+  {n:"Large Home / Casa Grande",p:390,from:"desde",d:"Full property + outdoor areas",time:"7–11 hrs · 2–3 cleaners",badge:"Most Complete ✨",popular:true},
+  {n:"Airbnb Express",p:80,d:"Quick turnaround between guests",time:"1–2 hrs · 1 cleaner",badge:"⚡ Express",gold:true}
+];
+const pg=document.getElementById('pricing-grid');
+tiers.forEach(t=>{
+  const c=document.createElement('div');
+  c.className=`hover-lift reveal relative rounded-2xl p-7 bg-white/5 border ${t.popular?'border-yellow-300':'border-white/10'}`;
+  if(t.popular)c.style.boxShadow='0 0 0 2px rgba(255,215,0,.3)';
+  c.innerHTML=`${t.badge?`<span class="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold" style="background:var(--gradient-gold);color:#1A3BCC">⭐ ${t.badge}</span>`:''}
+    <div class="text-sm uppercase tracking-wider text-muted">${t.n}</div>
+    <div class="mt-3 flex items-baseline gap-2"><span class="font-display text-5xl font-bold gradient-text-royal">$${t.p}</span>${t.from?`<span class="text-muted text-sm">${t.from}</span>`:''}</div>
+    <p class="mt-3 text-sm text-white/80">${t.d}</p>
+    <p class="text-xs text-muted mt-1">${t.time}</p>
+    <a href="#calculadora" class="mt-6 block w-full text-center rounded-xl py-2.5 font-accent font-semibold text-white" style="background:var(--gradient-primary)">Cotizar este servicio</a>`;
+  pg.appendChild(c);
+});
+
+/* === Calculator === */
+const calcType=document.getElementById('calc-type');
+const calcTotal=document.getElementById('calc-total');
+let freq=1;
+function recalc(){const base=parseFloat(calcType.value);calcTotal.textContent=Math.round(base*freq)}
+calcType.addEventListener('change',recalc);
+document.querySelectorAll('.freq-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.freq-btn').forEach(x=>x.classList.remove('bg-white/15','border-yellow-300'));
+    b.classList.add('bg-white/15','border-yellow-300');
+    freq=parseFloat(b.dataset.freq);recalc();
+  });
+});
+
+/* === Testimonials === */
+const reviews=[
+  {n:"María G.",c:"Arlington, VA",tag:"Verified customer",t:"Llevaba meses sin poder limpiar profundo por el trabajo. Llamé a Sparkle Elite un viernes y el lunes mi apartamento parecía nuevo. ¡Hasta olía diferente! Ahora son parte de mi rutina mensual."},
+  {n:"Carlos & Jennifer M.",c:"Washington DC",tag:"Verified customer",t:"Tenemos 2 perros y siempre dudamos de los servicios de limpieza. Sofia nos explicó todo sobre sus productos pet-safe y quedamos encantados. Los perritos bien, la casa brillando. ¡10/10!"},
+  {n:"Amanda T.",c:"Bethesda, MD",tag:"Airbnb Host",t:"Soy host de Airbnb y Sparkle Elite me salvó la vida. Mis huéspedes siempre comentan lo limpio que está. Mi rating subió de 4.2 a 4.9 desde que los contraté."},
+  {n:"Roberto L.",c:"Silver Spring, MD",tag:"Verified customer",t:"Después de la mudanza, la casa era un desastre. 3 personas, 5 horas, y quedó impecable. Precio justo y equipo super profesional."},
+  {n:"Patricia W.",c:"Alexandria, VA",tag:"Verified customer",t:"Tengo alergia al bleach. Sparkle Elite no solo tiene alternativas, llegaron con opciones para que yo eligiera. Ese nivel de cuidado no tiene precio."}
+];
+let ti=0;
+function renderT(){const r=reviews[ti];document.getElementById('t-text').textContent=`"${r.t}"`;document.getElementById('t-name').textContent=r.n;document.getElementById('t-city').textContent=r.c;document.getElementById('t-tag').textContent=r.tag}
+renderT();
+document.getElementById('t-prev').onclick=()=>{ti=(ti-1+reviews.length)%reviews.length;renderT()};
+document.getElementById('t-next').onclick=()=>{ti=(ti+1)%reviews.length;renderT()};
+setInterval(()=>{ti=(ti+1)%reviews.length;renderT()},7000);
+
+/* === Map === */
+const LOCATIONS=[
+  ["Capitol Hill","Washington DC",38.8899,-76.9874],["Georgetown","Washington DC",38.9076,-77.0723],
+  ["Dupont Circle","Washington DC",38.9096,-77.0434],["Adams Morgan","Washington DC",38.9219,-77.0417],
+  ["Navy Yard","Washington DC",38.8763,-77.0052],["U Street","Washington DC",38.9169,-77.0319],
+  ["Foggy Bottom","Washington DC",38.8976,-77.0511],["Columbia Heights","Washington DC",38.9284,-77.0322],
+  ["Alexandria","Virginia",38.8048,-77.0469],["Arlington","Virginia",38.8816,-77.0910],
+  ["Crystal City","Virginia",38.8573,-77.0502],["Ballston","Virginia",38.8822,-77.1114],
+  ["Tysons","Virginia",38.9212,-77.2230],["McLean","Virginia",38.9339,-77.1773],
+  ["Bethesda","Maryland",38.9848,-77.0947],["Silver Spring","Maryland",38.9940,-77.0313],
+  ["College Park","Maryland",38.9807,-76.9369],["Rockville","Maryland",39.0840,-77.1528],
+  ["Gaithersburg","Maryland",39.1434,-77.2014],["Takoma Park","Maryland",38.9776,-77.0026]
+];
+const map=L.map('map',{center:[38.9072,-77.0369],zoom:11,scrollWheelZoom:false});
+L.tileLayer("https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap © CARTO",subdomains:"abcd",maxZoom:19}).addTo(map);
+const icon=L.divIcon({className:'sparkle-pin',html:`<div style="width:34px;height:34px;border-radius:50%;background:#1A3BCC;border:2px solid #FFD700;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px -4px rgba(26,59,204,.6),0 0 0 4px rgba(255,215,0,.15);color:#FFD700;font-size:18px">✨</div>`,iconSize:[34,34],iconAnchor:[17,17]});
+LOCATIONS.forEach(([n,r,la,ln])=>{
+  L.marker([la,ln],{icon}).addTo(map).bindPopup(`<div style="font-family:Inter,sans-serif;min-width:180px;text-align:center"><div style="font-weight:700;color:#1A3BCC">✨ Sparkle Elite sirve esta área</div><div style="margin:6px 0 10px;font-size:13px">${n} <span style="color:#888">· ${r}</span></div><a href="#agenda" style="display:inline-block;padding:7px 14px;border-radius:999px;background:linear-gradient(135deg,#1A3BCC,#3651e3);color:#fff;text-decoration:none;font-weight:600;font-size:12px">Agenda aquí →</a></div>`);
+});
+
+/* === Booking === */
+document.getElementById('booking').addEventListener('submit',e=>{
+  e.preventDefault();
+  alert('¡Gracias! Te contactaremos por WhatsApp para confirmar tu reserva.');
+  e.target.reset();
+});
+
+/* === Chat toggle === */
+document.getElementById('chat-toggle').onclick=()=>document.getElementById('chat-panel').classList.toggle('hidden');
+
+/* === Reveal on scroll === */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
