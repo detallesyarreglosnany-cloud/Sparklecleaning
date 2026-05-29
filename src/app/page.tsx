@@ -3,8 +3,6 @@ import HeroSection from '@/components/sparkle/HeroSection'
 import PremiumIncludes from '@/components/sparkle/PremiumIncludes'
 import ServicesSection from '@/components/sparkle/ServicesSection'
 import ServiceCustomizer from '@/components/sparkle/ServiceCustomizer'
-import CalculatorSection from '@/components/sparkle/CalculatorSection'
-import PricingSection from '@/components/sparkle/PricingSection'
 import TestimonialsSection from '@/components/sparkle/TestimonialsSection'
 import CoverageMap from '@/components/sparkle/CoverageMap'
 import BookingSection from '@/components/sparkle/BookingSection'
@@ -21,8 +19,6 @@ export default function Home() {
         <PremiumIncludes />
         <ServicesSection />
         <ServiceCustomizer />
-        <CalculatorSection />
-        <PricingSection />
         <TestimonialsSection />
         <CoverageMap />
         <BookingSection />

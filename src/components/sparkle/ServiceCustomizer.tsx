@@ -12,75 +12,80 @@ const spaceTypes = [
   { id: 'apartment', label: '🏢 Apartamento', base: 130 },
   { id: 'house', label: '🏡 Casa', base: 180 },
   { id: 'airbnb', label: '🏨 Airbnb', base: 95 },
-  { id: 'event', label: '🎉 Evento', base: 250 },
-  { id: 'office', label: '🏢 Oficina', base: 80 },
-  { id: 'large-home', label: '🏠 Casa Grande', base: 390 },
+  { id: 'events', label: '🎉 Evento', base: 250 },
+  { id: 'office', label: '💼 Oficina', base: 80 },
+  { id: 'large-home', label: '🏘️ Casa Grande', base: 390 },
   { id: 'airbnb-express', label: '⚡ Airbnb Express', base: 80 },
 ]
 
-const cleaningTypes = [
-  { id: 'standard', label: 'Estándar', modifier: 1 },
-  { id: 'deep', label: 'Profunda', modifier: 1.4 },
-  { id: 'move', label: 'Mudanza', modifier: 1.5 },
-  { id: 'post-construction', label: 'Post-construcción', modifier: 1.6 },
+const cleaningLevels = [
+  {
+    id: 'premium',
+    label: 'Premium',
+    description: 'Incluye ventanas pequeñas, 1 refrigerador, 1 horno, limpieza profunda de cocina y hornos',
+    getPrice: (base: number) => base,
+  },
+  {
+    id: 'profunda',
+    label: 'Profunda',
+    description: 'Todo lo de Premium + cajones, gabinetes, congeladores extras, vidrios internos completos',
+    getPrice: (base: number) => Math.round(base * 1.4) + 15,
+  },
 ]
 
-const addOns = [
-  { id: 'refrigerator', label: 'Refrigerador', price: 30, emoji: '🧊' },
-  { id: 'oven', label: 'Horno', price: 25, emoji: '🔥' },
-  { id: 'windows', label: 'Ventanas (por habitación)', price: 15, emoji: '🪟' },
-  { id: 'laundry', label: 'Lavandería', price: 20, emoji: '👕' },
-  { id: 'organization', label: 'Organización', price: 35, emoji: '📦' },
+type PatioSize = 'none' | 'small' | 'medium' | 'large'
+type GarageSize = 'none' | 'one' | 'two'
+type AtticSize = 'none' | 'small' | 'medium' | 'large'
+
+const patioOptions: { id: PatioSize; label: string; price: number }[] = [
+  { id: 'none', label: 'Ninguno', price: 0 },
+  { id: 'small', label: 'Pequeño $50', price: 50 },
+  { id: 'medium', label: 'Mediano $70', price: 70 },
+  { id: 'large', label: 'Grande $90', price: 90 },
 ]
 
-const frequencies = [
-  { id: 'one-time', label: 'Una vez', discount: 0 },
-  { id: 'weekly', label: 'Semanal', discount: 0.2 },
-  { id: 'biweekly', label: 'Quincenal', discount: 0.15 },
-  { id: 'monthly', label: 'Mensual', discount: 0.1 },
+const garageOptions: { id: GarageSize; label: string; price: number }[] = [
+  { id: 'none', label: 'Ninguno', price: 0 },
+  { id: 'one', label: '1 auto $30', price: 30 },
+  { id: 'two', label: '2 autos $50', price: 50 },
+]
+
+const atticOptions: { id: AtticSize; label: string; price: number }[] = [
+  { id: 'none', label: 'Ninguno', price: 0 },
+  { id: 'small', label: 'Pequeño $20', price: 20 },
+  { id: 'medium', label: 'Mediano $40', price: 40 },
+  { id: 'large', label: 'Grande $60', price: 60 },
 ]
 
 export default function ServiceCustomizer() {
   const [step, setStep] = useState(1)
   const [spaceType, setSpaceType] = useState('')
-  const [cleaningType, setCleaningType] = useState('standard')
-  const [selectedAddOns, setSelectedAddOns] = useState<string[]>([])
-  const [rooms, setRooms] = useState(1)
-  const [bathrooms, setBathrooms] = useState(1)
-  const [frequency, setFrequency] = useState('one-time')
+  const [cleaningLevel, setCleaningLevel] = useState<'premium' | 'profunda'>('premium')
+  const [products, setProducts] = useState(false)
+  const [fold, setFold] = useState(false)
+  const [patio, setPatio] = useState<PatioSize>('none')
+  const [garage, setGarage] = useState<GarageSize>('none')
+  const [attic, setAttic] = useState<AtticSize>('none')
+
+  const selectedSpace = spaceTypes.find((s) => s.id === spaceType)
+  const basePrice = selectedSpace?.base ?? 0
+  const levelPrice = cleaningLevel === 'premium' ? basePrice : Math.round(basePrice * 1.4) + 15
+  const productsPrice = products ? Math.round(basePrice * 0.17) : 0
+  const foldPrice = fold ? Math.round(basePrice * 0.15) : 0
+  const patioPrice = patioOptions.find((p) => p.id === patio)?.price ?? 0
+  const garagePrice = garageOptions.find((g) => g.id === garage)?.price ?? 0
+  const atticPrice = atticOptions.find((a) => a.id === attic)?.price ?? 0
 
   const total = useMemo(() => {
-    const space = spaceTypes.find((s) => s.id === spaceType)
-    const cleaning = cleaningTypes.find((c) => c.id === cleaningType)
-    const freq = frequencies.find((f) => f.id === frequency)
-    if (!space || !cleaning || !freq) return 0
+    return levelPrice + productsPrice + foldPrice + patioPrice + garagePrice + atticPrice
+  }, [levelPrice, productsPrice, foldPrice, patioPrice, garagePrice, atticPrice])
 
-    let base = space.base * cleaning.modifier
-    // Add per-room/bathroom adjustments
-    base += (rooms - 1) * 25
-    base += (bathrooms - 1) * 20
-
-    // Add-ons
-    selectedAddOns.forEach((id) => {
-      const addOn = addOns.find((a) => a.id === id)
-      if (addOn) {
-        if (id === 'windows') base += addOn.price * rooms
-        else base += addOn.price
-      }
-    })
-
-    // Frequency discount
-    base = base * (1 - freq.discount)
-
-    return Math.round(base)
-  }, [spaceType, cleaningType, selectedAddOns, rooms, bathrooms, frequency])
-
-  const toggleAddOn = (id: string) => {
-    setSelectedAddOns((prev) => (prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]))
+  const canProceed = () => {
+    if (step === 1) return !!spaceType
+    return true
   }
 
-  const freqLabel = frequencies.find((f) => f.id === frequency)?.label || ''
-  const discount = frequencies.find((f) => f.id === frequency)?.discount || 0
+  const levelLabel = cleaningLevel === 'premium' ? 'Premium' : 'Profunda'
 
   return (
     <section id="personalizar" className="section-dark-alt py-16 md:py-20">
@@ -122,6 +127,14 @@ export default function ServiceCustomizer() {
               ))}
             </div>
 
+            {/* Step labels */}
+            <div className="flex justify-between mb-8 text-[10px] text-[rgba(232,240,255,0.4)] px-1 -mt-4">
+              <span className={step >= 1 ? 'text-gold' : ''}>Espacio</span>
+              <span className={step >= 2 ? 'text-gold' : ''}>Nivel</span>
+              <span className={step >= 3 ? 'text-gold' : ''}>Extras</span>
+              <span className={step >= 4 ? 'text-gold' : ''}>Resumen</span>
+            </div>
+
             {/* Steps */}
             <AnimatePresence mode="wait">
               {step === 1 && (
@@ -147,6 +160,7 @@ export default function ServiceCustomizer() {
                         }`}
                       >
                         {st.label}
+                        <span className="ml-1.5 text-xs opacity-70">${st.base}</span>
                       </button>
                     ))}
                   </div>
@@ -165,46 +179,36 @@ export default function ServiceCustomizer() {
                     ¿Cómo lo quieres?
                   </h3>
 
-                  {/* Cleaning type */}
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {cleaningTypes.map((ct) => (
-                      <button
-                        key={ct.id}
-                        onClick={() => setCleaningType(ct.id)}
-                        className={`px-4 py-2.5 rounded-xl text-sm transition-all duration-200 ${
-                          cleaningType === ct.id
-                            ? 'bg-gradient-to-r from-[#1A3BCC] to-[#2C4FE0] text-white font-semibold shadow-lg shadow-[#1A3BCC]/30'
-                            : 'glass-card text-[#E8F0FF] hover:border-[#1A3BCC]/30'
-                        }`}
-                      >
-                        {ct.label}
-                        {ct.modifier > 1 && (
-                          <span className="ml-1 text-xs opacity-70">+{Math.round((ct.modifier - 1) * 100)}%</span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Add-ons */}
-                  <h4 className="text-sm font-semibold text-[rgba(232,240,255,0.8)] mb-3">
-                    Servicios adicionales
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {addOns.map((ao) => (
-                      <button
-                        key={ao.id}
-                        onClick={() => toggleAddOn(ao.id)}
-                        className={`px-3 py-2 rounded-xl text-sm transition-all duration-200 flex items-center gap-2 ${
-                          selectedAddOns.includes(ao.id)
-                            ? 'bg-gradient-to-r from-[#FFE680] to-[#FFB300] text-[#0A0F2E] font-semibold'
-                            : 'glass-card text-[#E8F0FF] hover:border-gold/30'
-                        }`}
-                      >
-                        <span>{ao.emoji}</span>
-                        {ao.label}
-                        <span className="text-xs opacity-70">+${ao.price}</span>
-                      </button>
-                    ))}
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {cleaningLevels.map((cl) => {
+                      const isSelected = cleaningLevel === cl.id
+                      const price = cl.getPrice(basePrice)
+                      return (
+                        <button
+                          key={cl.id}
+                          onClick={() => setCleaningLevel(cl.id as 'premium' | 'profunda')}
+                          className={`text-left p-4 rounded-xl transition-all duration-200 ${
+                            isSelected
+                              ? 'bg-gradient-to-r from-[#FFE680] to-[#FFB300] text-[#0A0F2E] shadow-lg shadow-gold/20'
+                              : 'glass-card text-[#E8F0FF] hover:border-gold/30'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <span className={`font-semibold ${isSelected ? 'text-[#0A0F2E]' : 'text-white'}`}>
+                              {cl.label}
+                            </span>
+                            <span className={`font-[family-name:var(--font-montserrat)] font-bold text-lg ${
+                              isSelected ? 'text-[#0A0F2E]' : 'text-gold-gradient'
+                            }`}>
+                              ${price}
+                            </span>
+                          </div>
+                          <p className={`text-xs ${isSelected ? 'text-[#0A0F2E]/70' : 'text-[rgba(232,240,255,0.6)]'}`}>
+                            {cl.description}
+                          </p>
+                        </button>
+                      )
+                    })}
                   </div>
                 </motion.div>
               )}
@@ -218,73 +222,119 @@ export default function ServiceCustomizer() {
                   transition={{ duration: 0.3 }}
                 >
                   <h3 className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-white mb-4">
-                    Cuéntanos tu espacio
+                    Personaliza tu servicio
                   </h3>
 
-                  <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div>
-                      <label className="text-sm text-[rgba(232,240,255,0.7)] mb-1.5 block">
-                        Habitaciones
-                      </label>
+                  <div className="space-y-5">
+                    {/* Products toggle */}
+                    <div className="flex items-center justify-between p-3 rounded-xl glass-card">
+                      <div>
+                        <span className="text-sm text-[#E8F0FF] font-medium">🧴 Productos de limpieza</span>
+                        <p className="text-xs text-[rgba(232,240,255,0.5)]">17% del precio del servicio</p>
+                      </div>
                       <div className="flex items-center gap-3">
+                        <span className="text-gold font-[family-name:var(--font-montserrat)] font-bold text-sm">
+                          +${Math.round(basePrice * 0.17)}
+                        </span>
                         <button
-                          onClick={() => setRooms(Math.max(1, rooms - 1))}
-                          className="w-10 h-10 rounded-lg glass-card flex items-center justify-center text-white hover:border-gold/30 transition-colors"
+                          onClick={() => setProducts(!products)}
+                          className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
+                            products ? 'bg-gold' : 'bg-white/20'
+                          }`}
                         >
-                          -
-                        </button>
-                        <span className="text-xl font-bold text-gold w-8 text-center">{rooms}</span>
-                        <button
-                          onClick={() => setRooms(rooms + 1)}
-                          className="w-10 h-10 rounded-lg glass-card flex items-center justify-center text-white hover:border-gold/30 transition-colors"
-                        >
-                          +
+                          <motion.div
+                            className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow"
+                            animate={{ left: products ? '22px' : '2px' }}
+                            transition={{ duration: 0.2 }}
+                          />
                         </button>
                       </div>
                     </div>
-                    <div>
-                      <label className="text-sm text-[rgba(232,240,255,0.7)] mb-1.5 block">
-                        Baños
-                      </label>
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => setBathrooms(Math.max(1, bathrooms - 1))}
-                          className="w-10 h-10 rounded-lg glass-card flex items-center justify-center text-white hover:border-gold/30 transition-colors"
-                        >
-                          -
-                        </button>
-                        <span className="text-xl font-bold text-gold w-8 text-center">{bathrooms}</span>
-                        <button
-                          onClick={() => setBathrooms(bathrooms + 1)}
-                          className="w-10 h-10 rounded-lg glass-card flex items-center justify-center text-white hover:border-gold/30 transition-colors"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Frequency */}
-                  <h4 className="text-sm font-semibold text-[rgba(232,240,255,0.8)] mb-3">
-                    Frecuencia
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {frequencies.map((f) => (
-                      <button
-                        key={f.id}
-                        onClick={() => setFrequency(f.id)}
-                        className={`px-4 py-2.5 rounded-xl text-sm transition-all duration-200 ${
-                          frequency === f.id
-                            ? 'bg-gradient-to-r from-[#1A3BCC] to-[#2C4FE0] text-white font-semibold shadow-lg shadow-[#1A3BCC]/30'
-                            : 'glass-card text-[#E8F0FF] hover:border-[#1A3BCC]/30'
-                        }`}
-                      >
-                        {f.label}
-                        {f.discount > 0 && (
-                          <span className="ml-1 text-xs opacity-70">-{Math.round(f.discount * 100)}%</span>
-                        )}
-                      </button>
-                    ))}
+                    {/* Fold toggle */}
+                    <div className="flex items-center justify-between p-3 rounded-xl glass-card">
+                      <div>
+                        <span className="text-sm text-[#E8F0FF] font-medium">👕 Doblar ropa</span>
+                        <p className="text-xs text-[rgba(232,240,255,0.5)]">15% del precio del servicio</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-gold font-[family-name:var(--font-montserrat)] font-bold text-sm">
+                          +${Math.round(basePrice * 0.15)}
+                        </span>
+                        <button
+                          onClick={() => setFold(!fold)}
+                          className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
+                            fold ? 'bg-gold' : 'bg-white/20'
+                          }`}
+                        >
+                          <motion.div
+                            className="absolute top-0.5 w-5 h-5 rounded-full bg-white shadow"
+                            animate={{ left: fold ? '22px' : '2px' }}
+                            transition={{ duration: 0.2 }}
+                          />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Patio select */}
+                    <div className="p-3 rounded-xl glass-card">
+                      <span className="text-sm text-[#E8F0FF] font-medium block mb-2">🌿 Patio</span>
+                      <div className="flex flex-wrap gap-2">
+                        {patioOptions.map((opt) => (
+                          <button
+                            key={opt.id}
+                            onClick={() => setPatio(opt.id)}
+                            className={`px-3 py-2 rounded-lg text-xs transition-all duration-200 ${
+                              patio === opt.id
+                                ? 'bg-gradient-to-r from-[#FFE680] to-[#FFB300] text-[#0A0F2E] font-semibold'
+                                : 'bg-white/5 text-[#E8F0FF] hover:bg-white/10'
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Garage select */}
+                    <div className="p-3 rounded-xl glass-card">
+                      <span className="text-sm text-[#E8F0FF] font-medium block mb-2">🚗 Garage</span>
+                      <div className="flex flex-wrap gap-2">
+                        {garageOptions.map((opt) => (
+                          <button
+                            key={opt.id}
+                            onClick={() => setGarage(opt.id)}
+                            className={`px-3 py-2 rounded-lg text-xs transition-all duration-200 ${
+                              garage === opt.id
+                                ? 'bg-gradient-to-r from-[#FFE680] to-[#FFB300] text-[#0A0F2E] font-semibold'
+                                : 'bg-white/5 text-[#E8F0FF] hover:bg-white/10'
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Attic select */}
+                    <div className="p-3 rounded-xl glass-card">
+                      <span className="text-sm text-[#E8F0FF] font-medium block mb-2">🏠 Ático</span>
+                      <div className="flex flex-wrap gap-2">
+                        {atticOptions.map((opt) => (
+                          <button
+                            key={opt.id}
+                            onClick={() => setAttic(opt.id)}
+                            className={`px-3 py-2 rounded-lg text-xs transition-all duration-200 ${
+                              attic === opt.id
+                                ? 'bg-gradient-to-r from-[#FFE680] to-[#FFB300] text-[#0A0F2E] font-semibold'
+                                : 'bg-white/5 text-[#E8F0FF] hover:bg-white/10'
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </motion.div>
               )}
@@ -305,39 +355,52 @@ export default function ServiceCustomizer() {
                     <div className="flex justify-between text-sm">
                       <span className="text-[rgba(232,240,255,0.7)]">Tipo de espacio</span>
                       <span className="text-white">
-                        {spaceTypes.find((s) => s.id === spaceType)?.label || '-'}
+                        {selectedSpace?.label || '-'}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-[rgba(232,240,255,0.7)]">Tipo de limpieza</span>
-                      <span className="text-white">
-                        {cleaningTypes.find((c) => c.id === cleaningType)?.label || '-'}
-                      </span>
+                      <span className="text-[rgba(232,240,255,0.7)]">Precio base</span>
+                      <span className="text-white">${basePrice}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-[rgba(232,240,255,0.7)]">Habitaciones</span>
-                      <span className="text-white">{rooms}</span>
+                      <span className="text-[rgba(232,240,255,0.7)]">Nivel de limpieza</span>
+                      <span className="text-white">{levelLabel} — ${levelPrice}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[rgba(232,240,255,0.7)]">Baños</span>
-                      <span className="text-white">{bathrooms}</span>
-                    </div>
-                    {selectedAddOns.length > 0 && (
+
+                    {products && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-[rgba(232,240,255,0.7)]">Adicionales</span>
-                        <span className="text-white">
-                          {selectedAddOns.map((id) => addOns.find((a) => a.id === id)?.label).join(', ')}
-                        </span>
+                        <span className="text-[rgba(232,240,255,0.7)]">Productos de limpieza</span>
+                        <span className="text-white">+${productsPrice}</span>
                       </div>
                     )}
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[rgba(232,240,255,0.7)]">Frecuencia</span>
-                      <span className="text-white">{freqLabel}</span>
-                    </div>
-                    {discount > 0 && (
+                    {fold && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-gold">Descuento por frecuencia</span>
-                        <span className="text-gold">-{Math.round(discount * 100)}%</span>
+                        <span className="text-[rgba(232,240,255,0.7)]">Doblar ropa</span>
+                        <span className="text-white">+${foldPrice}</span>
+                      </div>
+                    )}
+                    {patio !== 'none' && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-[rgba(232,240,255,0.7)]">
+                          Patio {patioOptions.find((p) => p.id === patio)?.label.split(' ')[0]}
+                        </span>
+                        <span className="text-white">+${patioPrice}</span>
+                      </div>
+                    )}
+                    {garage !== 'none' && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-[rgba(232,240,255,0.7)]">
+                          Garage {garageOptions.find((g) => g.id === garage)?.label.split(' ')[0]} {garageOptions.find((g) => g.id === garage)?.label.split(' ')[1]}
+                        </span>
+                        <span className="text-white">+${garagePrice}</span>
+                      </div>
+                    )}
+                    {attic !== 'none' && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-[rgba(232,240,255,0.7)]">
+                          Ático {atticOptions.find((a) => a.id === attic)?.label.split(' ')[0]}
+                        </span>
+                        <span className="text-white">+${atticPrice}</span>
                       </div>
                     )}
                   </div>
@@ -354,6 +417,7 @@ export default function ServiceCustomizer() {
                         ${total}
                       </motion.span>
                     </div>
+                    <p className="text-xs text-[rgba(232,240,255,0.4)] mt-1">Precio sin productos de limpieza{products ? ' (productos incluidos)' : ''}</p>
                   </div>
 
                   <a href="#agendar">
@@ -380,7 +444,7 @@ export default function ServiceCustomizer() {
               {step < 4 && (
                 <Button
                   onClick={() => setStep(step + 1)}
-                  disabled={step === 1 && !spaceType}
+                  disabled={!canProceed()}
                   className="btn-glow font-[family-name:var(--font-montserrat)] font-semibold rounded-full"
                 >
                   Siguiente
