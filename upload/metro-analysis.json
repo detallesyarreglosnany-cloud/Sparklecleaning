@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "To determine the metro lines and stations in the WMATA DC Metro map, we analyze the colored lines and their associated stations:  \n\n\n### **Metro Lines (by Color)**  \n1. **Red Line** (top - left to top - right):  \n   Stations: Shady Grove, Rockville, Twinbrook, White Flint, Grosvenor, Medical Center, Bethesda, Friendship Heights, Tenleytown - AU, Van Ness - UDC, Cleveland Park, Woodley Park, Dupont Circle, Farragut North, Metro Center, Gallery Place - Chinatown, Judiciary Square, Union Station, NoMa - Gallaudet U, Rhode Island Ave, Brookland - CUAAve, Fort Totten, Takoma, Silver Spring, Forest Glen, Wheaton, Glenmont.  \n\n2. **Green Line** (right - side, with two branches):  \n   - **Branch 1 (top - right)**: Glenmont, Wheaton, Forest Glen, Silver Spring, Takoma, Fort Totten, Brookland - CUAAve, Rhode Island Ave, Gallaudet U, New York Ave, Union Station, Judiciary Square, Gallery Place - Chinatown, Mt Vernon Sq, Shaw - Howard U, U Street - Cardozo, Columbia Heights, Georgia Ave - Petworth, Columbia Heights, Fort Totten.  \n   - **Branch 2 (bottom - right)**: Greenbelt, College Park - U of Md, Prince George's Plaza, Hyattsville, West Hyattsville, Prince George's Plaza, College Park - U of Md, Greenbelt, Branch Avenue, Suitland, Naylor Road, Southern Ave, Congress Heights, Anacostia, Navy Yard, Waterfront - SEU.  \n\n3. **Orange Line** (left - side to right - side):  \n   Stations: Vienna - Fairfax - GMU, Dunn Loring, West Falls Church - VT/UVA, East Falls Church, Ballston - MU, Virginia Square - GMU, Clarendon, Court House, Rosslyn, Foggy Bottom - GWU, Farragut West, McPherson Sq, Federal Triangle, Metro Center, Smithsonian, L'Enfant Plaza, Federal Center SW, Capitol South, Eastern Market, Potomac Ave, Stadium - Armory, Benning Rd, Capitol Heights, Addison Rd, Seat Pleasant, Largo Town Center.  \n\n4. **Blue Line** (bottom - left to bottom - right):  \n   Stations: Franconia - Springfield, Van Dorn, King St, Braddock Rd, Pentagon City, Pentagon, Crystal City, Ronald Reagan Washington National Airport, L'Enfant Plaza, Federal Triangle, Metro Center, Smithsonian, Federal Center SW, Capitol South, Eastern Market, Potomac Ave, Stadium - Armory, Benning Rd, Capitol Heights, Addison Rd, Seat Pleasant, Largo Town Center.  \n\n5. **Yellow Line** (bottom - center, connecting to Blue Line):  \n   Stations: Huntington, Eisenhower Ave, King St, Braddock Rd, Pentagon City, Pentagon, Crystal City, Ronald Reagan Washington National Airport, L'Enfant Plaza.  \n\n\n### Summary  \nThe map shows the **Red, Green, Orange, Blue, and Yellow lines** of the WMATA DC Metro, with all stations listed above corresponding to their respective lines.  \n\nThe answer is: The WMATA DC Metro map shows the Red, Green, Orange, Blue, and Yellow lines, with stations including (but not limited to) Shady Grove, Glenmont, Greenbelt, Vienna - Fairfax - GMU, Largo Town Center, Franconia - Springfield, and Huntington. Red, Green, Orange, Blue, and Yellow lines (with stations like Shady Grove, Glenmont, Greenbelt, Vienna - Fairfax - GMU, Largo Town Center, Franconia - Springfield, Huntington, etc.)",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1780171059,
+  "id": "20260531035722e462b67e303046a4",
+  "model": "glm-4.6v",
+  "object": "chat.completion",
+  "request_id": "20260531035722e462b67e303046a4",
+  "usage": {
+    "completion_tokens": 797,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 1743,
+    "prompt_tokens_details": {
+      "cached_tokens": 4
+    },
+    "total_tokens": 2540
+  }
+}
