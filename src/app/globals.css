@@ -261,6 +261,43 @@
   color: #E8F0FF !important;
 }
 
+/* Metro tooltip styling */
+.metro-tooltip {
+  background: #0D1B4B !important;
+  color: #E8F0FF !important;
+  border: 1px solid rgba(255, 215, 0, 0.3) !important;
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+}
+
+.metro-tooltip::before {
+  border-top-color: #0D1B4B !important;
+}
+
+/* Leaflet controls dark override */
+.leaflet-control-zoom a {
+  background: #0D1B4B !important;
+  color: #E8F0FF !important;
+  border-color: rgba(255,255,255,0.1) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: rgba(255,215,0,0.2) !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(10,15,46,0.8) !important;
+  color: rgba(232,240,255,0.4) !important;
+  font-size: 9px !important;
+}
+
+.leaflet-control-attribution a {
+  color: rgba(255,215,0,0.5) !important;
+}
+
 /* Day picker overrides */
 .rdp {
   --rdp-cell-size: 36px;

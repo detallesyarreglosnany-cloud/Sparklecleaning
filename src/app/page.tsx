@@ -9,23 +9,26 @@ import BookingSection from '@/components/sparkle/BookingSection'
 import Footer from '@/components/sparkle/Footer'
 import WhatsAppFAB from '@/components/sparkle/WhatsAppFAB'
 import ChatWidget from '@/components/sparkle/ChatWidget'
+import { LocationProvider } from '@/components/sparkle/LocationContext'
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#0A0F2E]">
-      <Navbar />
-      <main className="flex-1">
-        <HeroSection />
-        <PremiumIncludes />
-        <ServicesSection />
-        <ServiceCustomizer />
-        <TestimonialsSection />
-        <CoverageMap />
-        <BookingSection />
-      </main>
-      <Footer />
-      <WhatsAppFAB />
-      <ChatWidget />
-    </div>
+    <LocationProvider>
+      <div className="min-h-screen flex flex-col bg-[#0A0F2E]">
+        <Navbar />
+        <main className="flex-1">
+          <HeroSection />
+          <PremiumIncludes />
+          <ServicesSection />
+          <ServiceCustomizer />
+          <TestimonialsSection />
+          <CoverageMap />
+          <BookingSection />
+        </main>
+        <Footer />
+        <WhatsAppFAB />
+        <ChatWidget />
+      </div>
+    </LocationProvider>
   )
 }

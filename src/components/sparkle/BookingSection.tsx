@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Calendar } from '@/components/ui/calendar'
 import { Button } from '@/components/ui/button'
@@ -16,8 +16,9 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { ScrollReveal } from './SparkleEffects'
-import { ChevronDown, ChevronUp, Upload, Clock, CheckCircle2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, Upload, Clock, CheckCircle2, MapPin, Navigation, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
+import { useLocationContext } from './LocationContext'
 
 const timeSlots = [
   { id: 'morning', label: 'Mañana', time: '7:00 - 11:00 AM', emoji: '🌅' },
@@ -38,6 +39,8 @@ const serviceTypes = [
 ]
 
 export default function BookingSection() {
+  const { location } = useLocationContext()
+
   const [date, setDate] = useState<Date | undefined>(undefined)
   const [timeSlot, setTimeSlot] = useState('')
   const [name, setName] = useState('')
@@ -49,6 +52,49 @@ export default function BookingSection() {
   const [zelleChecked, setZelleChecked] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // Location fields
+  const [address, setAddress] = useState('')
+  const [coordinates, setCoordinates] = useState('')
+  const [geoStatus, setGeoStatus] = useState<'idle' | 'loading' | 'in-area' | 'out-area'>('idle')
+
+  // Sync location from map
+  useEffect(() => {
+    if (location.selectedFromMap && location.lat && location.lng) {
+      setCoordinates(`${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`)
+      setGeoStatus(location.inCoverage ? 'in-area' : 'out-area')
+      if (!address) {
+        setAddress(location.address)
+      }
+    }
+  }, [location.selectedFromMap, location.lat, location.lng, location.inCoverage])
+
+  // Handle manual geolocation
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error('Tu navegador no soporta geolocalización.')
+      return
+    }
+    setGeoStatus('loading')
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude
+        const lng = pos.coords.longitude
+        setCoordinates(`${lat.toFixed(6)}, ${lng.toFixed(6)}`)
+        // Check against DC area
+        if (lat >= 38.7 && lat <= 39.2 && lng >= -77.5 && lng <= -76.9) {
+          setGeoStatus('in-area')
+        } else {
+          setGeoStatus('out-area')
+        }
+      },
+      () => {
+        toast.error('No se pudo obtener tu ubicación.')
+        setGeoStatus('idle')
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    )
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -58,13 +104,11 @@ export default function BookingSection() {
     }
 
     if (!zelleChecked) {
-      toast.error('Por favor confirma el depósito de $15 por Zelle.')
+      toast.error('Por favor confirma el depósito por Zelle.')
       return
     }
 
     setIsSubmitting(true)
-
-    // Simulate submission
     await new Promise((r) => setTimeout(r, 1500))
 
     toast.success('¡Reserva recibida! Te contactaremos pronto para confirmar.', {
@@ -80,6 +124,9 @@ export default function BookingSection() {
     setServiceType('')
     setNotes('')
     setZelleChecked(false)
+    setAddress('')
+    setCoordinates('')
+    setGeoStatus('idle')
   }
 
   return (
@@ -91,19 +138,40 @@ export default function BookingSection() {
               Agenda tu limpieza <span className="text-gold-gradient">ahora</span>
             </h2>
             <p className="text-[rgba(232,240,255,0.7)]">
-              En menos de 30 segundos, reserva tu fecha. Solo $15 de depósito.
+              En menos de 30 segundos, reserva tu fecha.
             </p>
           </div>
         </ScrollReveal>
+
+        {/* Location from map banner */}
+        {location.selectedFromMap && location.inCoverage && (
+          <ScrollReveal delay={0.05}>
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 rounded-xl bg-gold/10 border border-gold/20 flex items-start gap-3"
+            >
+              <Sparkles className="w-5 h-5 text-gold shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm text-white font-semibold">
+                  Ubicación recibida del mapa
+                </p>
+                <p className="text-xs text-[rgba(232,240,255,0.7)] mt-0.5">
+                  Coordenadas: {location.lat?.toFixed(5)}, {location.lng?.toFixed(5)} · Zona con cobertura confirmada
+                </p>
+              </div>
+            </motion.div>
+          </ScrollReveal>
+        )}
 
         <ScrollReveal delay={0.1}>
           <form onSubmit={handleSubmit}>
             <div className="glass-card rounded-2xl p-5 md:p-8">
               <div className="grid md:grid-cols-2 gap-8">
-                {/* LEFT: Calendar & Time */}
+                {/* LEFT: Calendar, Time & Location */}
                 <div>
                   <h3 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-white mb-4">
-                    Selecciona fecha y hora
+                    Selecciona fecha, hora y ubicación
                   </h3>
 
                   <div className="rounded-xl bg-white/5 border border-white/10 p-3 mb-5 inline-block">
@@ -120,7 +188,7 @@ export default function BookingSection() {
                         caption_label: 'text-sm font-medium text-white',
                         nav: 'space-x-1 flex items-center',
                         nav_button:
-                          'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 text-white inline-flex items-center justify-center rounded-md',
+                          'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity:100 text-white inline-flex items-center justify-center rounded-md',
                         nav_button_previous: 'absolute left-1',
                         nav_button_next: 'absolute right-1',
                         table: 'w-full border-collapse space-y-1',
@@ -145,7 +213,7 @@ export default function BookingSection() {
                     <Clock className="w-4 h-4 text-gold" />
                     Horario preferido
                   </h4>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-3 gap-2 mb-4">
                     {timeSlots.map((ts) => (
                       <button
                         key={ts.id}
@@ -162,6 +230,91 @@ export default function BookingSection() {
                         <span className="text-[10px] text-[rgba(232,240,255,0.6)] block">{ts.time}</span>
                       </button>
                     ))}
+                  </div>
+
+                  {/* Location Section */}
+                  <h4 className="text-sm font-semibold text-[rgba(232,240,255,0.8)] mb-3 flex items-center gap-2 mt-5">
+                    <MapPin className="w-4 h-4 text-gold" />
+                    Ubicación del servicio
+                  </h4>
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-xs text-[rgba(232,240,255,0.6)] mb-1 block">Dirección</Label>
+                      <Input
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        placeholder="123 Main St, Arlington, VA 22201"
+                        className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-gold/50"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-[rgba(232,240,255,0.6)] mb-1 block">Coordenadas</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={coordinates}
+                          onChange={(e) => setCoordinates(e.target.value)}
+                          placeholder="38.90720, -77.03690"
+                          className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-gold/50 flex-1"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleUseMyLocation}
+                          disabled={geoStatus === 'loading'}
+                          className="bg-white/5 border-white/10 text-[rgba(232,240,255,0.7)] hover:bg-white/10 hover:text-white shrink-0"
+                        >
+                          {geoStatus === 'loading' ? (
+                            <div className="w-4 h-4 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Navigation className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Coverage badge */}
+                    {geoStatus !== 'idle' && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`text-xs px-3 py-2 rounded-lg flex items-center gap-2 ${
+                          geoStatus === 'in-area'
+                            ? 'bg-green-500/10 border border-green-500/20 text-green-400'
+                            : geoStatus === 'out-area'
+                            ? 'bg-red-500/10 border border-red-500/20 text-red-400'
+                            : 'bg-yellow-500/10 border border-yellow-500/20 text-yellow-400'
+                        }`}
+                      >
+                        {geoStatus === 'in-area' && (
+                          <>
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            Zona de cobertura confirmada
+                          </>
+                        )}
+                        {geoStatus === 'out-area' && (
+                          <>
+                            <MapPin className="w-3.5 h-3.5" />
+                            Fuera de zona de cobertura, contáctanos
+                          </>
+                        )}
+                        {geoStatus === 'loading' && (
+                          <>
+                            <div className="w-3.5 h-3.5 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
+                            Obteniendo ubicación...
+                          </>
+                        )}
+                      </motion.div>
+                    )}
+
+                    {/* Link to map if no location */}
+                    {geoStatus === 'idle' && !location.selectedFromMap && (
+                      <div className="text-xs text-[rgba(232,240,255,0.4)] flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
+                        <span>¿No sabes si cubrimos tu zona?</span>
+                        <a href="#cobertura" className="text-gold hover:underline">Ver mapa</a>
+                      </div>
+                    )}
                   </div>
 
                   {/* Selected summary */}
@@ -183,6 +336,12 @@ export default function BookingSection() {
                           {timeSlots.find((t) => t.id === timeSlot)?.label}
                         </span>
                       </div>
+                      {coordinates && (
+                        <div className="flex items-center gap-2 text-xs mt-1">
+                          <MapPin className="w-3 h-3 text-gold" />
+                          <span className="text-[rgba(232,240,255,0.7)]">{coordinates}</span>
+                        </div>
+                      )}
                     </motion.div>
                   )}
                 </div>
@@ -283,7 +442,7 @@ export default function BookingSection() {
                         </div>
                         <div>
                           <div className="text-sm font-semibold text-white">
-                            Depósito de $15 para reservar
+                            Depósito para reservar
                           </div>
                           <div className="text-xs text-[rgba(232,240,255,0.6)]">
                             Se descuenta del total del servicio
@@ -316,7 +475,7 @@ export default function BookingSection() {
                           className="mt-0.5 data-[state=checked]:bg-gold data-[state=checked]:border-gold"
                         />
                         <label htmlFor="zelle-check" className="text-xs text-[rgba(232,240,255,0.8)] cursor-pointer">
-                          Confirmo que he enviado el depósito de $15 por Zelle
+                          Confirmo que he enviado el depósito por Zelle
                         </label>
                       </div>
                     </div>
