@@ -12,7 +12,7 @@ const includes = [
   'Limpieza interior del refrigerador',
   'Lavado y sanitización de papeleras',
   'Limpieza de campana extractora',
-  'Cambio de sábanas y edredones (Airbnb ✨)',
+  'Cambio de sábanas y edredones',
   'Aplicación de desinfectante (fragancia a tu elección)',
   'Recolección y retiro de basura',
   'Organización de espacios',

@@ -36,7 +36,7 @@ const testimonials = [
     rating: 5,
     text: 'Contraté el servicio post-construcción y quedó impecable. Polvo, residuos, todo desapareció. Muy profesionales.',
     verified: true,
-    service: 'Post-construcción',
+    service: 'Post construcción',
   },
   {
     name: 'Laura Pérez',

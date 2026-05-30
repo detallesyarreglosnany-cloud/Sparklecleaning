@@ -19,6 +19,7 @@ const pricingExamples = [
   { label: 'Casa Premium', original: 180, discounted: 144, savings: 36 },
   { label: 'Apartamento Profunda', original: 197, discounted: 158, savings: 39 },
   { label: 'Casa Grande Premium', original: 390, discounted: 312, savings: 78 },
+  { label: 'Casa Grande Profunda', original: 561, discounted: 449, savings: 112 },
 ]
 
 const steps = [
@@ -54,14 +55,14 @@ const cards = [
   {
     title: 'Segunda limpieza',
     price: '20% OFF',
-    description: 'Ahorras hasta $78 en tu misma空间',
+    description: 'Ahorras hasta $112 en tu mismo espacio',
     highlight: true,
     badge: 'POPULAR',
   },
   {
     title: 'Condiciones',
     price: 'Simple',
-    description: 'Mismo espacio · 30 días · Primera > $100',
+    description: 'Mismo espacio · 30 días · La primera > $100',
     highlight: false,
   },
 ]
@@ -115,8 +116,8 @@ export default function ServiceFollowUp() {
               <span className="text-gold-gradient">20% OFF</span>
             </h2>
             <p className="text-[rgba(232,240,255,0.7)] max-w-2xl mx-auto text-sm md:text-base">
-              Servicios mayores a $100 reciben un 20% de descuento en su segunda limpieza del mismo
-              espacio, dentro de los 30 días siguientes.
+              La primera limpieza mayor a $100 recibe un 20% de descuento en su segunda limpieza
+              del mismo espacio, dentro de los 30 días siguientes.
             </p>
           </div>
         </ScrollReveal>

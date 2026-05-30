@@ -19,21 +19,21 @@ interface Service {
 const services: Service[] = [
   { id: 'room', emoji: '🛏️', name: 'Room / Habitación', desc: '1 espacio + baño', base: 75, products: 13, fold: 11, profunda: 120 },
   { id: 'studio', emoji: '🏠', name: 'Studio', desc: '3 espacios + baño', base: 95, products: 16, fold: 14, profunda: 148 },
-  { id: 'apartment', emoji: '🏢', name: 'Apartment / Departamento', desc: 'Hasta 5 espacios + 2 baños', base: 130, products: 22, fold: 20, profunda: 197 },
+  { id: 'apartment', emoji: '🏢', name: 'Apartment / Apartamento', desc: 'Hasta 5 espacios + 2 baños', base: 130, products: 22, fold: 20, profunda: 197 },
   { id: 'house', emoji: '🏡', name: 'House / Casa', desc: '5+ espacios + áreas externas', base: 180, products: 31, fold: 27, profunda: 267 },
   { id: 'airbnb', emoji: '🏨', name: 'Airbnb / Vacation Rental', desc: 'Desde 1 espacio + baño', base: 95, products: 16, fold: 14, profunda: 148 },
   { id: 'events', emoji: '🎉', name: 'Events / Eventos', desc: 'Pre & post-evento', base: 250, products: 43, fold: 38, profunda: 365 },
   { id: 'office', emoji: '💼', name: 'Offices / Oficinas', desc: 'Espacios comerciales', base: 80, products: 14, fold: 12, profunda: 127 },
   { id: 'large-home', emoji: '🏘️', name: 'Large Home / Casa Grande', desc: 'Propiedad completa + outdoor', base: 390, products: 66, fold: 59, profunda: 561 },
-  { id: 'airbnb-express', emoji: '⚡', name: 'Airbnb Express', desc: 'Turnaround rápido', base: 80, products: 14, fold: 12, profunda: 127 },
+  { id: 'airbnb-express', emoji: '⚡', name: 'Airbnb Express', desc: 'Servicio de respuesta rápida', base: 80, products: 14, fold: 12, profunda: 127 },
 ]
 
 const premiumIncludes = [
+  'Cambio de sábanas y edredones',
   'Limpieza de ventanas pequeñas internas',
   '1 refrigerador',
-  '1 horno',
+  'Limpieza de horno y estufa',
   'Limpieza profunda de cocina',
-  'Limpieza de hornos',
 ]
 
 const profundaIncludes = [
@@ -70,7 +70,7 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
             {service.name}
           </h3>
           <p className="text-xs text-[rgba(232,240,255,0.6)] mb-3">{service.desc}</p>
-          <p className="text-[10px] text-[rgba(232,240,255,0.4)] mb-3">Sin productos de limpieza</p>
+          <p className="text-[10px] text-[rgba(232,240,255,0.4)] mb-3">Productos no incluidos</p>
 
           {/* Ver Detalles button */}
           <button

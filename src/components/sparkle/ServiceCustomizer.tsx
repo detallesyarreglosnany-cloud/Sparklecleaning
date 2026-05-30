@@ -22,7 +22,7 @@ const cleaningLevels = [
   {
     id: 'premium',
     label: 'Premium',
-    description: 'Incluye ventanas pequeñas, 1 refrigerador, 1 horno, limpieza profunda de cocina y hornos',
+    description: 'Incluye cambio de sábanas, ventanas pequeñas, 1 refrigerador, limpieza de horno y estufa, limpieza profunda de cocina',
     getPrice: (base: number) => base,
   },
   {
@@ -224,6 +224,11 @@ export default function ServiceCustomizer() {
                   <h3 className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-white mb-4">
                     Personaliza tu servicio
                   </h3>
+                  {(spaceType === 'events' || spaceType === 'office') && (
+                    <p className="text-xs text-gold/70 bg-gold/5 border border-gold/10 rounded-lg px-3 py-2 mb-4">
+                      Para Evento/Oficina, los extras se calculan según espacios y nivel de dificultad.
+                    </p>
+                  )}
 
                   <div className="space-y-5">
                     {/* Products toggle */}
